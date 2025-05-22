@@ -68,7 +68,7 @@ class Config:
                 'level': 'INFO',
                 'class': 'logging.handlers.RotatingFileHandler',
                 # 日志文件名
-                'filename': os.path.join(LOGS_DIR, "aiweb_sys_info.log"),
+                'filename': os.path.join(LOGS_DIR, "logmind.log"),
                 # 日志文件的最大值,这里设置15M
                 'maxBytes': 1500 * 1024 * 1024,
                 # 日志文件的数量,设置最大日志数量为10
@@ -105,8 +105,10 @@ class Config:
     # 项目配置
     PROJECE_CONFIG: dict = {
         "debug": False,
-        "description": """## ai_web """,
-        "title": "ai_web ",
+        "description": """## Logmind 
+        Logmind 是一个基于 FastAPI 的日志分析平台，支持多种数据源的接入和分析。
+        能够快速解析和分析日志数据，提供可视化的分析结果。并生成markdown格式的报告。""",
+        "title": "Logmind",
         "version": "0.0.1"
     }
 
