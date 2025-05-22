@@ -9,12 +9,12 @@
 '''
 
 import os
-from fastapi import FastAPI
-from fastapi.openapi.docs import (
-    get_swagger_ui_html,
-    get_redoc_html,
-    get_swagger_ui_oauth2_redirect_html,
-)
+import uuid
+
+from fastapi import FastAPI, Request, Response
+from fastapi.openapi.docs import (get_redoc_html, get_swagger_ui_html,
+                                  get_swagger_ui_oauth2_redirect_html)
+
 
 def register_static(app: FastAPI, setting):
     ''' 注册静态文件 '''
@@ -42,3 +42,19 @@ def register_static(app: FastAPI, setting):
             title=app.title + " - ReDoc",
             redoc_js_url="/swaggerstatic/redoc.standalone.js"
         )
+
+
+async def add_user_id_middleware(request: Request, call_next):
+    ''' 添加用户 ID 中间件 '''
+    # 从 cookie 中获取用户 ID
+    user_id = request.cookies.get("user_id")
+    if not user_id:
+        # 若没有用户 ID，生成一个新的 UUID 作为用户 ID
+        user_id = str(uuid.uuid4())
+    # 将用户 ID 添加到请求的 state 中，方便后续路由使用
+    request.state.user_id = user_id
+    response: Response = await call_next(request)
+    # 若 cookie 中没有用户 ID，将新生成的用户 ID 添加到 cookie 中
+    if not request.cookies.get("user_id"):
+        response.set_cookie(key="user_id", value=user_id)
+    return response

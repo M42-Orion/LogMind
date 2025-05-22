@@ -18,6 +18,8 @@ from fastapi.staticfiles import StaticFiles
 from config import setting
 from core.middleware import register_static
 from core.router import router
+from core.middleware import add_user_id_middleware
+
 
 app = FastAPI(docs_url=None,
               **setting.PROJECE_CONFIG
@@ -27,6 +29,9 @@ app.include_router(router)
 app.mount('/swaggerstatic', StaticFiles(directory=os.path.join(
     setting.STATIC_DIR, "swaggerstatic")), name="swaggerstatic")
 register_static(app, setting)
+
+app.middleware("http")(add_user_id_middleware)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, **setting.STARTUP_CONFIG)
