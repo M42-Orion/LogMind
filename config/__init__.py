@@ -37,6 +37,7 @@ class Config:
 
     # 配置目录
     CONFIG_DIR = os.path.join(PROJ_PATH, "config")
+    STATIC_DIR = os.path.join(PROJ_PATH, "build")
 
     # 日志目录
     LOGS_DIR = os.path.join(PROJ_PATH, "logs")

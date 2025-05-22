@@ -9,16 +9,24 @@
 '''
 
 
+import os
+
 import uvicorn
 from fastapi import FastAPI
-from core.router import router
-from config import setting
+from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(
-    **setting.PROJECE_CONFIG
-)
+from config import setting
+from core.middleware import register_static
+from core.router import router
+
+app = FastAPI(docs_url=None,
+              **setting.PROJECE_CONFIG
+              )
 app.include_router(router)
 
-if __name__ == "__main__":
+app.mount('/swaggerstatic', StaticFiles(directory=os.path.join(
+    setting.STATIC_DIR, "swaggerstatic")), name="swaggerstatic")
+register_static(app, setting)
 
+if __name__ == "__main__":
     uvicorn.run(app, **setting.STARTUP_CONFIG)
