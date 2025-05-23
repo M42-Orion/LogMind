@@ -35,10 +35,6 @@ class BaseLogSubParser:
         """
         raise NotImplementedError("子类必须实现parse_line方法")
 
-# ----------------------------
-# Nginx日志子解析器（增强）
-# ----------------------------
-
 
 class NginxLogSubParser(BaseLogSubParser):
     """增强型Nginx日志子解析器"""
