@@ -116,6 +116,11 @@ class Config:
     STARTUP_CONFIG = {"host": "127.0.0.1", "port": 8878}
     DEBUG = True if sys.gettrace() else False
     config = "dev.yaml" if DEBUG else "prod.yaml"
+    MONGOCONFIG = {"uri": "mongodb://192.168.174.136:27017",
+                   "max_pool_size": 100,
+                   "min_pool_size": 10,
+                   "connect_timeout": 30000, 
+                   }
 
     def __init__(self):
         with open(os.path.join(self.CONFIG_DIR, self.config), "r", encoding="utf_8_sig") as file:
