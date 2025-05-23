@@ -54,7 +54,7 @@ class NginxLogSubParser(BaseLogSubParser):
         r'(?P<status>\d+) (?P<body_bytes_sent>\d+) '
         r'"(?P<http_referer>[^"]*)" "(?P<http_user_agent>[^"]*)"'
     )
-    def __init__(self, custom_pattern: str = None):
+    def __init__(self, custom_pattern: str|None = None):
         """
         初始化Nginx日志解析器
         Args:
