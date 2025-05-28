@@ -12,10 +12,9 @@
 import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Generator, List, Optional
+import pandas as pd
 
 from .logparser import BaseLogSubParser
-
-import pandas as pd
 
 
 class FileParserStrategy(ABC):
