@@ -8,14 +8,16 @@
 @版本    :1.0
 '''
 
-import os
-import shutil
+import asyncio
 import hashlib
+import json
+import os
+import re
+import shutil
 import tempfile
 import zipfile
 from pathlib import Path
-from typing import Optional
-
+from typing import Any, Dict, Optional
 
 
 def create_directory(path: str,
@@ -56,6 +58,11 @@ def calculate_file_md5(file_path: str) -> str:
         for chunk in iter(lambda: f.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+async def calculate_file_hash_async(file_path: str) -> str:
+    """异步计算文件哈希"""
+    return await asyncio.to_thread(calculate_file_md5, file_path)
 
 
 def unzip_file(zip_file_path: str, extract_dir: Optional[str] = None) -> str:
@@ -111,3 +118,74 @@ def get_temp_file(suffix: str = "") -> str:
 def get_temp_directory() -> str:
     """获取临时目录路径"""
     return tempfile.mkdtemp()
+
+
+def move_file(src: str, dst: str) -> bool:
+    """移动文件到指定目录"""
+    try:
+        if not os.path.isfile(src):
+            raise FileNotFoundError(f"源文件不存在: {src}")
+        create_directory(os.path.dirname(dst), exist_ok=True)
+        shutil.move(src, dst)
+        return True
+    except Exception as e:
+        return False
+
+
+def move_directory(src: str, dst: str) -> None:
+    """移动目录到指定目录"""
+    if not os.path.isdir(src):
+        raise FileNotFoundError(f"源目录不存在: {src}")
+    create_directory(dst, exist_ok=True)
+    shutil.move(src, dst)
+
+
+def copy_file(src: str, dst: str) -> None:
+    """复制文件到指定目录"""
+    if not os.path.isfile(src):
+        raise FileNotFoundError(f"源文件不存在: {src}")
+    create_directory(os.path.dirname(dst), exist_ok=True)
+    shutil.copy2(src, dst)
+
+
+def copy_directory(src: str, dst: str) -> None:
+    """复制目录到指定目录"""
+    if not os.path.isdir(src):
+        raise FileNotFoundError(f"源目录不存在: {src}")
+    create_directory(dst, exist_ok=True)
+    shutil.copytree(src, dst, dirs_exist_ok=True)
+
+def extract_and_parse_json(output: str) -> Optional[Dict[str, Any]]:
+    """
+    从大模型输出中提取并解析JSON数据
+    
+    Args:
+        output: 大模型输出的文本，可能包含Markdown格式的JSON包裹
+        
+    Returns:
+        解析后的JSON对象，若提取或解析失败则返回None
+    """
+    try:
+        # 1. 使用正则表达式提取JSON内容
+        # 匹配 ```json 或 ``` 包裹的JSON数据
+        match = re.search(
+            r'```(?:json)?\s*([\s\S]*?)```',
+            output
+        )
+        if not match:
+            # 尝试直接解析是否为JSON
+            try:
+                return json.loads(output)
+            except json.JSONDecodeError:
+                print("未找到JSON包裹格式，且直接解析失败")
+                return None
+        # 2. 提取JSON字符串并去除前后空格
+        json_str = match.group(1).strip()
+        # 3. 解析JSON
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        print(f"JSON解析错误: {e}")
+        return None
+    except Exception as e:
+        print(f"处理过程中发生错误: {e}")
+        return None
